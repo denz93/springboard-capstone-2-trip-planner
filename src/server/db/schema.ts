@@ -1,10 +1,10 @@
-import { uuid, integer, pgEnum, pgTable, serial, uniqueIndex, varchar, date, boolean, timestamp, check, time, text } from 'drizzle-orm/pg-core';
+import { jsonb, integer, pgEnum, pgTable, serial, uniqueIndex, varchar, date, boolean, timestamp, check, time, text } from 'drizzle-orm/pg-core';
 import { sql, relations } from 'drizzle-orm';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod'
 
 export const MapProviderEnum = pgEnum('map_provider', ['google', 'here']);
-
+export const AccountEnum = pgEnum('account_type', ['local', 'google'])
 export const User = pgTable('users', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 255 }),
@@ -13,6 +13,13 @@ export const User = pgTable('users', {
 }, (t) => ({
   uniqueEmail: uniqueIndex('unique_email').on(t.email),
 }))
+
+export const Account = pgTable('accounts', {
+  type: AccountEnum('type'),
+  userId: integer('user_id').references(() => User.id, { onDelete: 'cascade' }),
+  secret: varchar('value'),
+  metadata: jsonb('metadata')
+})
 export const Trip = pgTable('trips', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
@@ -77,9 +84,10 @@ export const authRelations = relations(RefreshToken, ({ one }) => ({
   user: one(User, { fields: [RefreshToken.userId], references: [User.id] }),
 }))
 
-export const userRelations = relations(User, ({ many }) => ({
+export const userRelations = relations(User, ({ one, many }) => ({
   trips: many(Trip),
   itineraries: many(Itinerary),
+  account: one(Account, { fields: [User.id], references: [Account.userId] }),
 }))
 
 export const tripRelations = relations(Trip, ({ one }) => ({

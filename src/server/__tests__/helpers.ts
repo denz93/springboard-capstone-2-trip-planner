@@ -41,7 +41,7 @@ async function generateUsers(size: number) {
     const fakeName = faker.person.fullName()
     const user = await db.insert(User).values({
       name: fakeName,
-      email: `${fakeName}@example.com`
+      email: `${fakeName.replaceAll(' ', '.')}@example.com`.toLowerCase()
     }).returning()
     users.push(user[0])
   }

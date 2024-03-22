@@ -5,7 +5,13 @@ export class InvalidTokenError extends Error {
 }
 
 export class UserNotFoundError extends Error {
-  constructor() {
-    super('User not found')
+  constructor(message = 'User not found') {
+    super(message)
+  }
+}
+
+export class EmailAlreadyInUseError extends Error {
+  constructor(message = 'Email already in use') {
+    super(message)
   }
 }
