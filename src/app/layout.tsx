@@ -17,11 +17,11 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="mytheme">
       <body className={inter.className}>
         <Provider>
           <Header />
-          <main>{children}</main>
+          <main className="px-8 py-8">{children}</main>
           <Footer />
         </Provider>
       </body>

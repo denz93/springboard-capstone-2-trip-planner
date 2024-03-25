@@ -1,11 +1,30 @@
-import { InsertTripSchema, Itinerary, SelectTripSchema, UpdateTripSchema } from "@/server/db";
+import { InsertTripSchema, Itinerary, SelectTripSchema, UpdateTripSchema, Trip, db } from "@/server/db";
 import { z } from 'zod';
-import { Trip, db } from '@/server/db';
-import { NotNull, eq } from 'drizzle-orm';
-import * as itineraryService from '../itinerary/itinerary.service';
+import { eq } from 'drizzle-orm';
+import { type ExtractDrizzleRelations } from "@/server/db/schema.helper";
 
 export async function findOne(id: z.infer<typeof SelectTripSchema>["id"]) {
-  return (await db.select().from(Trip).where(eq(Trip.id, id))).at(0)
+  return await db.query.Trip.findFirst({
+    where: eq(Trip.id, id),
+  })
+}
+
+export async function findOneWithRelation(id: z.infer<typeof SelectTripSchema>["id"]) {
+  return await db.query.Trip.findFirst({
+    where: eq(Trip.id, id),
+    with: {
+      itinerary: {
+        with: {
+          place: true,
+          stops: {
+            with: {
+              place: true
+            }
+          }
+        }
+      }
+    }
+  })
 }
 
 export async function findByUserId(userId: NonNullable<z.infer<typeof SelectTripSchema>["userId"]>) {

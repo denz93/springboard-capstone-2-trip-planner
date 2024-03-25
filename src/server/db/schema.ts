@@ -24,7 +24,7 @@ export const Trip = pgTable('trips', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
-  starDate: date('star_date', { mode: 'date' }),
+  startDate: date('star_date', { mode: 'date' }),
   endDate: date('end_date', { mode: 'date' }),
   groupSize: integer('group_size').default(1),
   hasChildren: boolean('has_children').default(false),
@@ -97,10 +97,12 @@ export const tripRelations = relations(Trip, ({ one }) => ({
 export const itineraryRelations = relations(Itinerary, ({ one, many }) => ({
   stops: many(ItineraryStop),
   trip: one(Trip),
+  place: one(Place, { fields: [Itinerary.placeId], references: [Place.id] }),
 }))
 
 export const itineraryStopRelations = relations(ItineraryStop, ({ one, many }) => ({
   itinerary: one(Itinerary, { fields: [ItineraryStop.itineraryId], references: [Itinerary.id] }),
+  place: one(Place, { fields: [ItineraryStop.placeId], references: [Place.id] }),
 }))
 
 export const InsertUserSchema = createInsertSchema(User, {

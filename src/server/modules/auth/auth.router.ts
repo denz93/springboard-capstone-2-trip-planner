@@ -2,6 +2,7 @@ import { LocalLoginInputSchema, LocalRegisterInputSchema } from '@/server/module
 import { router, publicProcedure } from '@/server/trpc'
 import { z } from 'zod';
 import * as authService from './auth.service'
+import { db } from '@/server/db';
 
 export const authRouter = router({
   me: publicProcedure.query(async (opts) => {
@@ -29,5 +30,11 @@ export const authRouter = router({
     .mutation(async (opts) => {
       opts.ctx.session.destroy()
       return true
-    })
+    }),
+
+  dev: publicProcedure.mutation(async (opts) => {
+    const user = await db.query.User.findFirst()
+    opts.ctx.session.userId = user?.id ?? null
+    await opts.ctx.session.save()
+  })
 })

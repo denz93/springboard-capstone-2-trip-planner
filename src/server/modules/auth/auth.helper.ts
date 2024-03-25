@@ -3,6 +3,7 @@ import * as userService from '@/server/modules/user/user.service'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import { cookies } from 'next/headers'
 import { getIronSession, type IronSession } from 'iron-session';
+import { db } from '@/server/db';
 
 const SESSION_PASSWORD = process.env.SESSION_PASSWORD || ''
 const SESSION_NAME = 'iron_session'

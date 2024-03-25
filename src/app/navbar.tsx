@@ -38,7 +38,7 @@ export default function Navbar({
               Trips
             </Link>
             <Link className="" href={"/profile"}>
-              Profile
+              Hi {user?.name}!
             </Link>
             <Link
               className=""

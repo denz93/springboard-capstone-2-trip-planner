@@ -1,8 +1,10 @@
 import { publicProcedure, router } from './trpc';
 import { db, Trip } from './db'
 import { authRouter } from './modules/auth/auth.router';
+import { tripRouter } from '@/server/modules/trip/trip.router';
 export const appRouter = router({
-  auth: authRouter
+  auth: authRouter,
+  trip: tripRouter
 });
 
 // Export only the type of a router!
