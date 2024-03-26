@@ -17,7 +17,7 @@ const ALGORITHMS: Algorithm[] = ['HS512']
 const ISSUER = 'trip-planner'
 const ACCESS_TOKEN_MAX_AGE = '1h'
 const REFRESH_TOKEN_MAX_AGE = 30
-const BBCRYPT_SALT_ROUNDS = 12
+const BCRYPT_SALT_ROUNDS = 12
 
 /**
  * Verify an access token and return userId
@@ -148,7 +148,7 @@ export async function createAccountLocal(input: z.infer<typeof LocalRegisterInpu
       }).returning())[0]
       await tx.insert(Account).values({
         userId: user.id,
-        secret: await bcrypt.hash(input.password, BBCRYPT_SALT_ROUNDS),
+        secret: await bcrypt.hash(input.password, BCRYPT_SALT_ROUNDS),
         type: 'local',
       })
       return user
@@ -166,3 +166,6 @@ export async function logout() {
   return true
 }
 
+export async function authHash(data: string | Buffer) {
+  return await bcrypt.hash(data, BCRYPT_SALT_ROUNDS)
+}
