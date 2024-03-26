@@ -1,7 +1,8 @@
-import { db, Trip, User, Itinerary, ItineraryStop, Place, SelectUserSchema, SelectItinerarySchema, SelectItineraryStopSchema } from '@/server/db'
+import { db, Trip, User, Itinerary, ItineraryStop, Place, SelectUserSchema, SelectItinerarySchema, SelectItineraryStopSchema, Account } from '@/server/db'
 import { faker } from '@faker-js/faker'
 import { z } from 'zod';
 import { addDays, startOfToday, format, addHours } from 'date-fns';
+import { authHash } from '../modules/auth/auth.service';
 
 export async function testCleanUp() {
   await db.delete(Place)
@@ -16,7 +17,14 @@ export async function initData() {
   let trips = [
     await generateTrip(users[0], 2, true),
     await generateTrip(users[0], 1),
+    await generateTrip(users[0], 5),
+    await generateTrip(users[0], 4),
+
     await generateTrip(users[1], 3),
+    await generateTrip(users[1], 4),
+    await generateTrip(users[1], 5),
+
+
   ]
   const relationUsers = await db.query.User.findMany({
     with: {
@@ -39,11 +47,17 @@ async function generateUsers(size: number) {
   const users = []
   for (let i = 0; i < size; i++) {
     const fakeName = faker.person.fullName()
-    const user = await db.insert(User).values({
+    const user = (await db.insert(User).values({
       name: fakeName,
       email: `${fakeName.replaceAll(' ', '.')}@example.com`.toLowerCase()
-    }).returning()
-    users.push(user[0])
+    }).returning())[0]
+
+    await db.insert(Account).values({
+      userId: user.id,
+      type: "local",
+      secret: await authHash("demo123123")
+    })
+    users.push(user)
   }
   return users
 }
@@ -57,7 +71,7 @@ async function generateTrip(user: z.infer<typeof SelectUserSchema>, days: number
     name: faker.lorem.sentence(4),
     userId: user.id,
     itineraryId: itinerary.id,
-    starDate: start,
+    startDate: start,
     endDate: addDays(start, days)
   }).returning()
   return trip[0]
@@ -73,11 +87,11 @@ async function generateItinerary(ownerId: number, isPublic: boolean, days: numbe
     ownerId: ownerId
   }).returning())[0]
 
-  const numOfStops = faker.number.int({ min: days, max: days + 2 })
+  const numOfStops = faker.number.int({ min: days, max: days + 5 })
   let startTime = startOfToday()
   const stops = []
   for (let i = 0; i < numOfStops; i++) {
-    const interval = faker.number.int({ min: 1, max: 3 })
+    const interval = faker.number.int({ min: 1, max: 6 })
     const stop = (await db.insert(ItineraryStop).values({
       startTime: format(startTime, 'HH:mm:ss'),
       endTime: format(addHours(startTime, interval), 'HH:mm:ss'),
