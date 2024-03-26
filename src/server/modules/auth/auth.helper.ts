@@ -7,6 +7,10 @@ import { db } from '@/server/db';
 
 const SESSION_PASSWORD = process.env.SESSION_PASSWORD || ''
 const SESSION_NAME = 'iron_session'
+if (process.env.NODE_ENV !== 'production') {
+  console.log(`SESSION_PASSWORD: ${SESSION_PASSWORD}`)
+  console.log(`SESSION_NAME: ${SESSION_NAME}`)
+}
 export async function extractUserFromAuthHeader(req: Request) {
   const authHeader = req.headers.get('Authorization')
   if (!authHeader)
