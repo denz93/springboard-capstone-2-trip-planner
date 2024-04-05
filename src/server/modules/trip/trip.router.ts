@@ -1,5 +1,5 @@
-import { InsertTripSchema, SelectTripSchema } from "@/server/db";
-import { router, publicProcedure } from "@/server/trpc";
+import { InsertTripSchema, SelectTripSchema, UpdateTripSchema } from "@/server/db";
+import { router, publicProcedure, tripOwnerProcedure } from "@/server/trpc";
 import * as tripService from '@/server/modules/trip/trip.service'
 import { z } from 'zod';
 
@@ -20,5 +20,9 @@ export const tripRouter = router({
     }),
   getTripWithItinerary: publicProcedure.input(SelectTripSchema.pick({ id: true })).query(async (opts) => {
     return await tripService.findOneWithRelation(opts.input.id)
+  }),
+
+  update: tripOwnerProcedure.input(UpdateTripSchema).mutation(async (opts) => {
+    return await tripService.update(opts.input)
   })
 })

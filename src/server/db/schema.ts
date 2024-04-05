@@ -1,7 +1,8 @@
-import { jsonb, integer, pgEnum, pgTable, serial, uniqueIndex, varchar, date, boolean, timestamp, check, time, text } from 'drizzle-orm/pg-core';
+import { jsonb, integer, pgEnum, pgTable, serial, uniqueIndex, varchar, date, boolean, timestamp, check, time, text, decimal } from 'drizzle-orm/pg-core';
 import { sql, relations } from 'drizzle-orm';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod'
+import { latitude, longitude } from './custom-types';
 
 export const MapProviderEnum = pgEnum('map_provider', ['google', 'here']);
 export const AccountEnum = pgEnum('account_type', ['local', 'google'])
@@ -19,19 +20,23 @@ export const Account = pgTable('accounts', {
   userId: integer('user_id').references(() => User.id, { onDelete: 'cascade' }),
   secret: varchar('value'),
   metadata: jsonb('metadata')
-})
+}, (t) => ({
+  uniqueIndex: uniqueIndex('unique_userid_accounttype').on(t.type, t.userId)
+}))
 export const Trip = pgTable('trips', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
-  startDate: date('star_date', { mode: 'date' }),
-  endDate: date('end_date', { mode: 'date' }),
-  groupSize: integer('group_size').default(1),
-  hasChildren: boolean('has_children').default(false),
+  startDate: timestamp('star_date', { mode: 'date' }),
+  endDate: timestamp('end_date', { mode: 'date' }),
+  groupSize: integer('group_size').default(1).notNull(),
+  hasChildren: boolean('has_children').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   userId: integer('user_id').references(() => User.id, { onDelete: 'cascade' }),
   itineraryId: integer('itinerary_id').references(() => Itinerary.id, { onDelete: 'set null' }),
-})
+}, (t) => ({
+  positiveGroupSize: check(t.groupSize.name, sql` > 0`)
+}))
 
 export const Itinerary = pgTable('itineraries', {
   id: serial('id').primaryKey(),
@@ -63,8 +68,8 @@ export const Place = pgTable('places', {
   name: varchar('name', { length: 255 }).notNull(),
   address: varchar('address', { length: 1000 }).notNull(),
   imageUrl: text('image_url'),
-  lat: varchar('lat', { length: 255 }).notNull(),
-  lng: varchar('lng', { length: 255 }).notNull(),
+  lat: latitude('lat').notNull(),
+  lng: longitude('lng').notNull(),
   provider: MapProviderEnum('provider').notNull(),
   providerPlaceId: varchar('provider_place_id', { length: 255 }).notNull(),
 }, (t) => ({
@@ -116,6 +121,8 @@ export const InsertTripSchema = createInsertSchema(Trip);
 export const UpdateTripSchema = InsertTripSchema
   .omit({ userId: true, itineraryId: true, createdAt: true })
   .extend({ id: z.number() })
+  .extend({ name: InsertTripSchema.shape.name.min(1).optional() })
+  .extend({ groupSize: InsertTripSchema.shape.groupSize.unwrap().min(1).int().max(1000).default(1).optional() })
 
 export const SelectItinerarySchema = createSelectSchema(Itinerary);
 export const InsertItinerarySchema = createInsertSchema(Itinerary)

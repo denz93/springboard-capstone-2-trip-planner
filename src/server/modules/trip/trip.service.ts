@@ -28,7 +28,16 @@ export async function findOneWithRelation(id: z.infer<typeof SelectTripSchema>["
 }
 
 export async function findByUserId(userId: NonNullable<z.infer<typeof SelectTripSchema>["userId"]>) {
-  return (await db.select().from(Trip).where(eq(Trip.userId, userId)))
+  return await db.query.Trip.findMany({
+    where: eq(Trip.userId, userId),
+    with: {
+      itinerary: {
+        with: {
+          place: true
+        }
+      }
+    }
+  })
 }
 
 export async function create(trip: z.infer<typeof InsertTripSchema>) {

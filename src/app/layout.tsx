@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/app/header";
 import { Footer } from "@/app/footer";
 import Provider from "@/app/api/trpc/[trpc]/provider";
+import GoogleMapProvider from "./components/google-map/provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -17,12 +18,15 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="mytheme">
-      <body className={inter.className}>
+    <html lang="en" data-theme="dim" className="scroll-smooth dark">
+      <body className={`${inter.className} scroll-smooth`}>
         <Provider>
-          <Header />
-          <main className="px-8 py-8">{children}</main>
-          <Footer />
+          <GoogleMapProvider apiKey={process.env.GOOGLE_MAP_API_KEY ?? ""}>
+
+            <Header />
+            <main className="px-8 py-8">{children}</main>
+            <Footer />
+          </GoogleMapProvider>
         </Provider>
       </body>
     </html>

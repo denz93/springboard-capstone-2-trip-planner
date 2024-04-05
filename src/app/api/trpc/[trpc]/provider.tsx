@@ -6,9 +6,10 @@ import { trpc } from "./client";
 import superjson from "superjson";
 
 export default function Provider({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(() => new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false } } }));
   const [trpcClient] = useState(() =>
     trpc.createClient({
+
       links: [
         httpBatchLink({
           url: "/api/trpc",

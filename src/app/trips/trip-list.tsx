@@ -4,6 +4,8 @@ import { trpc } from "@/app/api/trpc/[trpc]/client";
 import type { RouterOutputs, RouterInputs } from "@/app/api/trpc/[trpc]/client";
 import TripCard from "@/app/trips/trip-card";
 import Link from "next/link";
+import { sortBy } from "../helpers/sort";
+import { differenceInDays } from "date-fns";
 type TripListType = RouterOutputs["trip"]["getUserTrips"];
 
 export default function TripList({
@@ -17,6 +19,9 @@ export default function TripList({
     { userId },
     {
       initialData: initialTrips,
+      select(trips) {
+        return sortBy(trips).desc().by(t => t.startDate && t.startDate > new Date() ? 1 : -1).asc().by(t => differenceInDays(t.startDate ?? new Date(), new Date())).result()
+      },
     }
   );
 
@@ -25,11 +30,11 @@ export default function TripList({
   }
 
   return (
-    <ul className="list-none flex flex-wrap gap-4">
+    <ul className="list-none grid grid-cols-1 auto-rows-fr gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
       {data.length === 0 && <li className="text-center">No trips</li>}
       {data.map((trip) => (
         <li key={trip.id}>
-          <Link href={`/trips/${trip.id}`} className="no-underline">
+          <Link href={`/trips/${trip.id}`} className="no-underline block h-full">
             <TripCard trip={trip} />
           </Link>
         </li>

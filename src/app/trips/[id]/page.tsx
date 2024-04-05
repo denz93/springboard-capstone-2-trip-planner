@@ -2,6 +2,12 @@ import { randomBackgroundUrl } from "@/app/trips/[id]/random-bg";
 import TripDetail from "@/app/trips/[id]/trip-detail";
 import * as tripService from "@/server/modules/trip/trip.service";
 import Image from "next/image";
+import { CiEdit } from "react-icons/ci";
+import Modal from "@/app/components/modal";
+import EditTripForm from "./trip-edit-form";
+import TripStat from "./trip-stat";
+import AddItineraryStop from "./add-itinerary-stop";
+import { IoMdAdd } from "react-icons/io";
 
 export default async function TripPage({ params }: { params: { id: number } }) {
   const trip = await tripService.findOneWithRelation(params.id);
@@ -25,7 +31,40 @@ export default async function TripPage({ params }: { params: { id: number } }) {
           </div>
         </div>
       </div>
-      <h2 className="text-center text-3xl font-bold my-4">Itinerary</h2>
+      <div className="flex justify-center py-8 px-6">
+        <TripStat initialTrip={trip} />
+      </div>
+
+      <div className="flex gap-4 justify-center">
+        <Modal
+          activator={
+            <button className="btn btn-neutral rounded-xs">
+              <CiEdit />
+              Edit
+            </button>
+          }
+        >
+          <h1 className=" font-bold text-center">Update Your Trip</h1>
+          <EditTripForm trip={trip} />
+        </Modal>
+
+        <Modal
+          activator={
+            <button className="btn btn-neutral rounded-xs">
+              <IoMdAdd />
+              Add New Stop
+            </button>
+          }
+        >
+          <h1 className="text-center">Create New Stop to Your Journey</h1>
+          <AddItineraryStop trip={trip} />
+        </Modal>
+      </div>
+
+      <h1 className="text-center  font-bold my-16 divider">
+        <span>Itinerary</span>
+      </h1>
+
       <TripDetail initialTrip={trip} tripId={trip.id} />
     </div>
   );

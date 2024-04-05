@@ -10,5 +10,6 @@ export default async function Trips() {
 
       <TripList initialTrips={trips} userId={user?.id ?? -1} />
     </div>
+
   );
 }

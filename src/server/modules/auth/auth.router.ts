@@ -32,8 +32,10 @@ export const authRouter = router({
       return true
     }),
 
-  dev: publicProcedure.mutation(async (opts) => {
-    const user = await db.query.User.findFirst()
+  dev: publicProcedure.input(z.object({ skip: z.number().default(0) }).optional()).mutation(async (opts) => {
+    const user = await db.query.User.findFirst({
+      offset: opts.input?.skip ?? 0
+    })
     opts.ctx.session.userId = user?.id ?? null
     await opts.ctx.session.save()
   })
