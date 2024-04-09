@@ -5,15 +5,16 @@ import { Header } from "@/app/header";
 import { Footer } from "@/app/footer";
 import Provider from "@/app/api/trpc/[trpc]/provider";
 import GoogleMapProvider from "./components/google-map/provider";
+import { AlertProvider } from "./components/alert";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Trip Planner",
-  description: "Efficiently plan your trip with ease",
+  description: "Efficiently plan your trip with ease"
 };
 
 export default async function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
@@ -22,10 +23,11 @@ export default async function RootLayout({
       <body className={`${inter.className} scroll-smooth`}>
         <Provider>
           <GoogleMapProvider apiKey={process.env.GOOGLE_MAP_API_KEY ?? ""}>
-
-            <Header />
-            <main className="px-8 py-8">{children}</main>
-            <Footer />
+            <AlertProvider>
+              <Header />
+              <main className="px-8 py-8">{children}</main>
+              <Footer />
+            </AlertProvider>
           </GoogleMapProvider>
         </Provider>
       </body>

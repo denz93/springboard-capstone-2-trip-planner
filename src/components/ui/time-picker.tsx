@@ -1,14 +1,6 @@
-import {
-  useEffect,
-  useState,
-  ComponentPropsWithoutRef,
-  useCallback,
-  useRef,
-} from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 import { cn } from "@/lib/utils";
-import { formatDate, setHours } from "date-fns";
-import { Nullable } from "vitest";
 type Time = {
   hour: number;
   minute: number;
@@ -28,7 +20,7 @@ function parseTimeStr(time: string | null) {
     return {
       hour: +matcher[1],
       minute: +matcher[2],
-      ampm: matcher[3] as unknown as "am" | "pm",
+      ampm: matcher[3] as unknown as "am" | "pm"
     };
   }
 
@@ -40,6 +32,27 @@ function toTimeStr(time: Partial<Time> | null) {
   return `${(time.hour ?? 0).toString().padStart(2, "0")}:${(time.minute ?? 0).toString().padStart(2, "0")} ${time.ampm ?? ""}`;
 }
 
+function from24hStringTime(time: string | null) {
+  if (!time) return null;
+
+  const [hour, minute, second] = time.split(":");
+  if (!hour || !minute) return null;
+  return {
+    hour: +hour > 12 ? +hour - 12 : +hour,
+    minute: +minute,
+    ampm: +hour > 12 ? "pm" : "am"
+  } as Time;
+}
+function to24hStringTime(time: Partial<Time> | null) {
+  if (time?.ampm === "pm") {
+    return `${((time?.hour === 12 ? 0 : time?.hour) ?? 0) + 12}:${(time.minute ?? "").toString().padStart(2, "0")}:00`;
+  }
+  if (time?.ampm === "am") {
+    return `${(time.hour ?? "").toString().padStart(2, "0")}:${(time.minute ?? "").toString().padStart(2, "0")}:00`;
+  }
+  return undefined;
+}
+
 export default function TimePicker({
   onTimeChange,
   className,
@@ -49,10 +62,18 @@ export default function TimePicker({
 }: React.ComponentPropsWithoutRef<"input"> & {
   stepMinute?: number;
   time?: string | null;
-  onTimeChange?: (time: Partial<Time> | null) => void;
+  onTimeChange?: (time?: Partial<Time> | null, time24hString?: string) => void;
 }) {
-  const [value, setValue] = useState<Partial<Time> | null>(parseTimeStr(time));
-  const [inputValue, setInputValue] = useState(toTimeStr(parseTimeStr(time)));
+  const [value, setValue] = useState<Partial<Time> | null>(
+    from24hStringTime(time)
+  );
+  const [inputValue, setInputValue] = useState(
+    toTimeStr(from24hStringTime(time))
+  );
+  useEffect(() => {
+    setValue(from24hStringTime(time));
+    setInputValue(toTimeStr(from24hStringTime(time)));
+  }, [time]);
   return (
     <div
       className={cn("group relative input input-bordered px-0", className)}
@@ -61,12 +82,12 @@ export default function TimePicker({
           return;
         }
         setInputValue(toTimeStr(value));
-        onTimeChange?.(value);
+        onTimeChange?.(value, to24hStringTime(value));
       }}
     >
       <input
         className={cn(
-          "bg-transparent relative input my-auto focus:border-0 w-full h-full",
+          "bg-transparent relative input my-auto focus:border-0 w-full h-full"
         )}
         onKeyDown={(e) => {
           if (
@@ -82,7 +103,7 @@ export default function TimePicker({
               ":",
               " ",
               "ArrowLeft",
-              "ArrowRight",
+              "ArrowRight"
             ].includes(e.key)
           ) {
             return;

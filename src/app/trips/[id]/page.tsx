@@ -1,13 +1,13 @@
 import { randomBackgroundUrl } from "@/app/trips/[id]/random-bg";
-import TripDetail from "@/app/trips/[id]/trip-detail";
+import TripDetail from "@/app/trips/[id]/itinerary-detail";
 import * as tripService from "@/server/modules/trip/trip.service";
 import Image from "next/image";
 import { CiEdit } from "react-icons/ci";
 import Modal from "@/app/components/modal";
 import EditTripForm from "./trip-edit-form";
 import TripStat from "./trip-stat";
-import AddItineraryStop from "./add-itinerary-stop";
-import { IoMdAdd } from "react-icons/io";
+import { FaTrash } from "react-icons/fa6";
+import RemoveTrip from "./remove-trip";
 
 export default async function TripPage({ params }: { params: { id: number } }) {
   const trip = await tripService.findOneWithRelation(params.id);
@@ -40,7 +40,7 @@ export default async function TripPage({ params }: { params: { id: number } }) {
           activator={
             <button className="btn btn-neutral rounded-xs">
               <CiEdit />
-              Edit
+              Edit Trip
             </button>
           }
         >
@@ -50,19 +50,26 @@ export default async function TripPage({ params }: { params: { id: number } }) {
 
         <Modal
           activator={
-            <button className="btn btn-neutral rounded-xs">
-              <IoMdAdd />
-              Add New Stop
+            <button className="btn btn-outline btn-warning rounded-xs">
+              <FaTrash />
+              Remove Trip
             </button>
           }
         >
-          <h1 className="text-center">Create New Stop to Your Journey</h1>
-          <AddItineraryStop trip={trip} />
+          <h1 className="text-center">{trip.name}</h1>
+          <RemoveTrip id={trip.id} />
         </Modal>
       </div>
 
-      <h1 className="text-center  font-bold my-16 divider">
-        <span>Itinerary</span>
+      <h1 className="text-center font-bold my-16 divider relative">
+        <div className="relative">
+          <span>Itinerary</span>
+          {trip.itinerary?.isPublic && (
+            <span className="absolute badge badge-accent -right-4 top-0 translate-x-[100%]">
+              Public
+            </span>
+          )}
+        </div>
       </h1>
 
       <TripDetail initialTrip={trip} tripId={trip.id} />

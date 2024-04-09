@@ -3,11 +3,12 @@ import Link from "next/link";
 
 export default function Error({
   error,
-  reset,
+  reset
 }: {
   error: Error;
   reset: () => void;
 }) {
+  console.log({ error });
   return (
     <div className="prose max-w-none text-center">
       <h2>Somthing went wrong</h2>

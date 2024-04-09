@@ -6,11 +6,12 @@ import { LatLngLiteral } from "@googlemaps/google-maps-services-js";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { FaStar } from "react-icons/fa6";
+import { priceLevelBadge } from "./helpers";
 
 type NearBySearch = google.maps.places.PlacesService["nearbySearch"];
 type GoogleNearBySearchCallback<T = NearBySearch> = T extends (
   d: any,
-  callback: infer C,
+  callback: infer C
 ) => void
   ? C
   : never;
@@ -25,12 +26,12 @@ let globalResolve:
 const callbackHandler: GoogleNearBySearchCallback = (
   result,
   status,
-  pagination,
+  pagination
 ) => {
   if (!globalResolve) return;
   globalResolve({
     data: result ?? [],
-    next: pagination?.hasNextPage ? pagination : null,
+    next: pagination?.hasNextPage ? pagination : null
   });
 };
 const searchNearBy = async (
@@ -40,7 +41,7 @@ const searchNearBy = async (
     | null,
   opts?: {
     request: Parameters<NearBySearch>["0"];
-  },
+  }
 ) => {
   if (!placesService) return { data: [], next: null };
   if (placesService instanceof google.maps.places.PlacesService) {
@@ -62,12 +63,40 @@ const searchNearBy = async (
   }
 };
 
+const textSearch = async (
+  placesService:
+    | google.maps.places.PlacesService
+    | google.maps.places.PlaceSearchPagination
+    | null,
+  opts?: Parameters<google.maps.places.PlacesService["textSearch"]>[0]
+) => {
+  if (!placesService) return { data: [], next: null };
+
+  if (placesService instanceof google.maps.places.PlacesService) {
+    return new Promise<{
+      data: google.maps.places.PlaceResult[];
+      next: google.maps.places.PlaceSearchPagination | null;
+    }>((resolve) => {
+      globalResolve = resolve;
+      placesService.textSearch(opts ?? {}, callbackHandler);
+    });
+  } else {
+    return new Promise<{
+      data: google.maps.places.PlaceResult[];
+      next: google.maps.places.PlaceSearchPagination | null;
+    }>((resolve) => {
+      globalResolve = resolve;
+      placesService.nextPage();
+    });
+  }
+};
+
 export default function PlaceSearch({
   onSelectedPlace,
-  baseLocation,
+  baseLocation
 }: {
   onSelectedPlace?: (place: google.maps.places.PlaceResult) => void;
-  baseLocation: google.maps.LatLng | LatLngLiteral;
+  baseLocation?: google.maps.LatLng | LatLngLiteral;
 }) {
   const [searchValue, setSearchValue] = useState("");
   const debounceSearchValue = useDebounceValue(searchValue);
@@ -84,13 +113,13 @@ export default function PlaceSearch({
     fetchNextPage,
     isPending,
     isSuccess,
-    isFetchingNextPage,
+    isFetchingNextPage
   } = useInfiniteQuery({
     queryKey: [
       "google.places",
       baseLocation,
       debounceSearchValue,
-      placesService != null,
+      placesService != null
     ],
     enabled: false,
     getNextPageParam: (lastPage: {
@@ -105,41 +134,22 @@ export default function PlaceSearch({
     initialPageParam: placesService,
     initialData: { pages: [], pageParams: [] },
     queryFn: async ({ pageParam }) => {
+      if (!baseLocation) {
+        return textSearch(pageParam, { query: debounceSearchValue });
+      }
       return searchNearBy(pageParam, {
         request: {
           location: baseLocation,
           radius: 50000,
-          keyword: debounceSearchValue,
-        },
+          keyword: debounceSearchValue
+        }
       });
-    },
+    }
   });
 
   useEffect(() => {
     refetch();
   }, [debounceSearchValue]);
-
-  const priceLevelBadge = (priceLevel: number) => {
-    return (
-      <div className="badge badge-neutral font-mono ">
-        <div className={"font-bold  " + (priceLevel >= 0 ? "" : "opacity-25")}>
-          $
-        </div>
-        <div className={"font-bold " + (priceLevel >= 1 ? "" : "opacity-25")}>
-          $
-        </div>
-        <div className={"font-bold " + (priceLevel >= 2 ? "" : "opacity-25")}>
-          $
-        </div>
-        <div className={"font-bold " + (priceLevel >= 3 ? "" : "opacity-25")}>
-          $
-        </div>
-        <div className={"font-bold " + (priceLevel >= 4 ? "" : "opacity-25")}>
-          $
-        </div>
-      </div>
-    );
-  };
 
   const items = useMemo(() => {
     return pages
@@ -147,7 +157,8 @@ export default function PlaceSearch({
       .map((place, idx) => {
         const url =
           place.photos?.[0].getUrl({ maxHeight: 300, maxWidth: 300 }) ?? "";
-        const isSelected = selectedPlace === place;
+        const isSelected =
+          selectedPlace === place || selectedPlace?.place_id === place.place_id;
 
         return (
           <div
@@ -160,7 +171,6 @@ export default function PlaceSearch({
             onClick={() => {
               setSelectedPlace(place);
               onSelectedPlace?.(place);
-              console.log({ place });
             }}
           >
             <div className="col-start-1 col-span-1 w-full h-28">
@@ -171,7 +181,9 @@ export default function PlaceSearch({
             </div>
             <div className="col-start-2 col-span-3 grid grid-rows-3 pl-2 gap-y-2">
               <p className="line-clamp-1 ">{place.name}</p>
-              <p className="italic opacity-80 text-xs">{place.vicinity}</p>
+              <p className="italic opacity-80 text-xs">
+                {place.vicinity ?? place.formatted_address}
+              </p>
               <div className="flex items-center">
                 {place.rating !== undefined && (
                   <span className="flex-shrink-0 badge badge-neutral">
@@ -212,16 +224,15 @@ export default function PlaceSearch({
   }, [pages, selectedPlace]);
 
   return (
-    <SearchBox className="justify-self-center" autoFocus={false}>
-      <SearchBox.Trigger autoFocus={false}>
+    <SearchBox className="justify-self-center w-full">
+      <SearchBox.Trigger>
         <input
-          autoFocus={false}
-          className="input input-bordered w-96"
+          className="input input-bordered min-w-60 w-full"
           placeholder="Find your favorite places..."
           onChange={(e) => setSearchValue(e.target.value)}
         />
       </SearchBox.Trigger>
-      <SearchBox.Content className="border border-slate-600 rounded-md mt-4 shadow-md bg-base-100 z-50">
+      <SearchBox.Content className="border border-slate-600 rounded-md mt-4 shadow-lg bg-base-100 z-50">
         <div className="grid grid-cols-1 relative  max-h-96 overflow-scroll">
           {isPending && (
             <div className="justify-self-center animate-pulse italic">
@@ -234,7 +245,9 @@ export default function PlaceSearch({
             </div>
           )}
           {!isPending && !isError && items.length === 0 && (
-            <div className="justify-self-center italic">No places found.</div>
+            <div className="justify-self-center italic py-6">
+              No places found.
+            </div>
           )}
 
           {!isPending && items.length > 0 && items}

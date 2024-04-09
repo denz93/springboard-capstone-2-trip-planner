@@ -43,7 +43,7 @@ export const tripOwnerProcedure = authProcedure
 export const itineraryOwnerProcedure = authProcedure
   .input(z.object({ id: z.number() }))
   .use(async ({ ctx, input, next }) => {
-    const itinerary = db.query.Itinerary.findFirst({
+    const itinerary = await db.query.Itinerary.findFirst({
       where: and(
         eq(Itinerary.id, input.id),
         eq(Itinerary.ownerId, ctx.user.id),

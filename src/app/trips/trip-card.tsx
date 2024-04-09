@@ -1,7 +1,7 @@
 "use client";
 import { RouterOutputs } from "@/app/api/trpc/[trpc]/client";
 import { useCallback, useEffect, useState } from "react";
-import { format, differenceInDays } from "date-fns";
+import { format, differenceInCalendarDays, addDays } from "date-fns";
 import { FaPeopleLine as PeopleIcon } from "react-icons/fa6";
 import { MdEmojiPeople as PersonIcon } from "react-icons/md";
 import { getStatusBadge } from "./trip-status-helper";
@@ -9,27 +9,34 @@ import { useGoogleLibrary } from "../components/google-map/hooks";
 
 type TripType = NonNullable<RouterOutputs["trip"]["getUserTrips"][number]>;
 export default function TripCard({ trip }: { trip: TripType }) {
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
-  const PlacesLibrary = useGoogleLibrary("PlacesLibrary")
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const PlacesLibrary = useGoogleLibrary("PlacesLibrary");
   useEffect(() => {
     async function fetchPhotos() {
-      if (!PlacesLibrary) return
-      if (!trip.itinerary) return
-      const { Place } = PlacesLibrary
-      const place = new Place({ id: trip.itinerary?.place?.providerPlaceId ?? '' })
-      const { place: newPlace } = await place.fetchFields({ fields: ['displayName', 'formattedAddress', 'location', 'photos'] })
-      if (!newPlace.photos) return
+      if (!PlacesLibrary) return;
+      if (!trip.itinerary) return;
+      const { Place } = PlacesLibrary;
+      const place = new Place({
+        id: trip.itinerary?.place?.providerPlaceId ?? ""
+      });
+      const { place: newPlace } = await place.fetchFields({
+        fields: ["displayName", "formattedAddress", "location", "photos"]
+      });
+      if (!newPlace.photos) return;
       const photoUrl = newPlace.photos[0].getURI({
-        maxWidth: 1200, maxHeight: 800
-      })
-      setPhotoUrl(photoUrl)
+        maxWidth: 1200,
+        maxHeight: 800
+      });
+      setPhotoUrl(photoUrl);
     }
-    fetchPhotos()
-  }, [trip, PlacesLibrary])
+    fetchPhotos();
+  }, [trip, PlacesLibrary]);
   return (
     <div className="card bg-base-300 shadow-xl h-full">
       <figure className="relative h-72">
-        {photoUrl && <img src={photoUrl} className="h-full w-full object-cover" />}
+        {photoUrl && (
+          <img src={photoUrl} className="h-full w-full object-cover" />
+        )}
         {!photoUrl && <div className="skeleton h-72 w-72"></div>}
         <div className="absolute w-full h-full bg-slate-950/60"></div>
         <div className="absolute top-0 flex w-full items-center px-4 py-2">
@@ -61,7 +68,11 @@ export default function TripCard({ trip }: { trip: TripType }) {
 
           {trip.startDate && trip.endDate && (
             <div className="badge badge-outline">
-              {differenceInDays(trip.endDate, trip.startDate)} days
+              {differenceInCalendarDays(
+                addDays(trip.endDate, 1),
+                trip.startDate
+              )}{" "}
+              days
             </div>
           )}
         </div>

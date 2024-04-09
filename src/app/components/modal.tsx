@@ -6,7 +6,7 @@ export default function Modal({
   children,
   activator,
   action,
-  isShowModal = false,
+  isShowModal = false
 }: {
   children?: React.ReactNode;
   activator?: React.ReactNode;
@@ -19,7 +19,7 @@ export default function Modal({
       <div
         onClick={() =>
           isShowModal
-            ? dialogRef.current?.showModal({})
+            ? dialogRef.current?.showModal()
             : dialogRef.current?.show()
         }
       >
@@ -27,9 +27,11 @@ export default function Modal({
       </div>
       <dialog ref={dialogRef} className="modal" autoFocus={false}>
         <div
-          className="modal-box max-w-none w-10/12 shadow-lg"
+          className="modal-box max-w-none w-full md:w-10/12 shadow-lg"
           autoFocus={false}
         >
+          <input className="w-0 h-0" onLoad={(e) => e.currentTarget.remove()} />
+
           {children}
           <div className="modal-action">
             <form method="dialog">
