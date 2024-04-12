@@ -4,7 +4,7 @@ import GoogleLoginButton from "./google/login-button";
 
 export default function Login() {
   return (
-    <section className="flex flex-col items-center">
+    <section className="flex flex-col items-center min-h-[calc(100svh-136px)]">
       <h1 className="">Login</h1>
 
       <div className="join join-vertical w-full max-w-96">

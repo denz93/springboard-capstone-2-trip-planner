@@ -62,12 +62,23 @@ export async function create(trip: z.infer<typeof InsertTripSchema>) {
 
 export async function update(trip: z.infer<typeof UpdateTripSchema>) {
   const { id, ...data } = trip;
-  const result = await db
-    .update(Trip)
-    .set(data)
-    .where(eq(Trip.id, id))
-    .returning();
-  return result[0];
+  return db.transaction(async (tx) => {
+    const newTrip = (
+      await tx.update(Trip).set(data).where(eq(Trip.id, id)).returning()
+    ).at(0);
+    if (!newTrip) return undefined;
+
+    tx.update(Itinerary)
+      .set({
+        days:
+          newTrip.endDate && newTrip.startDate
+            ? differenceInCalendarDays(newTrip.endDate, newTrip.startDate)
+            : 0
+      })
+      .where(eq(Itinerary.id, newTrip.itineraryId ?? -1));
+
+    return newTrip;
+  });
 }
 
 export async function remove(id: z.infer<typeof SelectTripSchema>["id"]) {

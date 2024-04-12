@@ -62,13 +62,8 @@ export default async function TripPage({ params }: { params: { id: number } }) {
       </div>
 
       <h1 className="text-center font-bold my-16 divider relative">
-        <div className="relative">
+        <div className="">
           <span>Itinerary</span>
-          {trip.itinerary?.isPublic && (
-            <span className="absolute badge badge-accent -right-4 top-0 translate-x-[100%]">
-              Public
-            </span>
-          )}
         </div>
       </h1>
 

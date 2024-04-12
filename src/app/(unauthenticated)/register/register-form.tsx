@@ -6,13 +6,13 @@ import { LocalRegisterInputSchema } from "@/server/modules/auth/auth.schema";
 import { trpc } from "@/app/api/trpc/[trpc]/client";
 const LocalRegisterWithConfirmPasswordInputSchema =
   LocalRegisterInputSchema.extend({
-    confirmPassword: z.string().min(1),
+    confirmPassword: z.string().min(1)
   }).superRefine((arg, ctx) => {
     if (arg.password !== arg.confirmPassword) {
       ctx.addIssue({
         path: ["confirmPassword"],
         code: "custom",
-        message: "Password and Confirm Password do not match",
+        message: "Password and Confirm Password do not match"
       });
     }
   });
@@ -20,21 +20,22 @@ export default function RegisterForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm<z.infer<typeof LocalRegisterWithConfirmPasswordInputSchema>>({
-    resolver: zodResolver(LocalRegisterWithConfirmPasswordInputSchema),
+    resolver: zodResolver(LocalRegisterWithConfirmPasswordInputSchema)
   });
   const { mutate, isPending } = trpc.auth.registerLocal.useMutation();
   return (
     <form
-      className="flex flex-col gap-4 items-start"
+      className="flex flex-col gap-4 items-start w-80"
       onSubmit={handleSubmit(({ confirmPassword, ...data }) => mutate(data))}
       autoComplete="off"
     >
-      <div className="flex flex-col gap-1 w-52">
+      <div className="flex flex-col gap-1 w-full">
         <label htmlFor="email">Email</label>
         {errors.email && <label htmlFor="email">{errors.email.message}</label>}
         <input
+          className="input input-bordered w-full"
           disabled={isPending}
           id="email"
           type="email"
@@ -42,10 +43,11 @@ export default function RegisterForm() {
           {...register("email")}
         />
       </div>
-      <div className="flex flex-col gap-1 w-52">
+      <div className="flex flex-col gap-1 w-full">
         <label htmlFor="name">Name (optional)</label>
         {errors.name && <label htmlFor="name">{errors.name.message}</label>}
         <input
+          className="input input-bordered w-full"
           disabled={isPending}
           id="name"
           type="text"
@@ -53,12 +55,13 @@ export default function RegisterForm() {
           {...register("name")}
         />
       </div>
-      <div className="flex flex-col gap-1 w-52">
+      <div className="flex flex-col gap-1 w-full">
         <label htmlFor="password">Password</label>
         {errors.password && (
           <label htmlFor="password">{errors.password.message}</label>
         )}
         <input
+          className="input input-bordered w-full"
           disabled={isPending}
           id="password"
           type="password"
@@ -66,7 +69,7 @@ export default function RegisterForm() {
           {...register("password")}
         />
       </div>
-      <div className="flex flex-col gap-1 w-52">
+      <div className="flex flex-col gap-1 w-full">
         <label htmlFor="confirmPassword">Confirm Password</label>
         {errors.confirmPassword && (
           <label htmlFor="confirmPassword">
@@ -74,6 +77,7 @@ export default function RegisterForm() {
           </label>
         )}
         <input
+          className="input input-bordered w-full"
           disabled={isPending}
           id="confirmPassword"
           type="password"
@@ -81,7 +85,7 @@ export default function RegisterForm() {
           {...register("confirmPassword")}
         />
       </div>
-      <button className="w-full">Register</button>
+      <button className="w-full btn btn-neutral">Register</button>
     </form>
   );
 }
