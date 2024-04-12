@@ -1,5 +1,9 @@
-import { itineraryOwnerProcedure, router } from "@/server/trpc";
-import { AddStopSchema } from "./itinerary.schema";
+import {
+  itineraryOwnerProcedure,
+  publicProcedure,
+  router
+} from "@/server/trpc";
+import { AddStopSchema, PaginationParamsSchema } from "./itinerary.schema";
 import * as itineraryService from "./itinerary.service";
 import { InsertItineraryStopSchema } from "@/server/db";
 import { z } from "zod";
@@ -18,5 +22,36 @@ export const itineraryRouter = router({
 
   findOneWithRelation: itineraryOwnerProcedure.query(async ({ ctx }) => {
     return await itineraryService.findOneWithRelation(ctx.itinerary.id);
-  })
+  }),
+
+  getPublicItineraries: publicProcedure
+    .input(
+      z.object({
+        pagination: PaginationParamsSchema.optional()
+      })
+    )
+    .query(async ({ input }) => {
+      const pagination = PaginationParamsSchema.parse(input.pagination);
+      const data = await itineraryService.findAll(
+        { isPublic: true },
+        pagination
+      );
+      const nextCursor =
+        data.length === pagination.limit ? data.at(-1) ?? null : null;
+      return { data, nextCursor };
+    }),
+
+  makePublic: itineraryOwnerProcedure
+    .input(
+      z.object({
+        isPublic: z.boolean().default(true)
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await itineraryService.publish(
+        ctx.itinerary.id,
+        ctx.user.id,
+        input.isPublic
+      );
+    })
 });

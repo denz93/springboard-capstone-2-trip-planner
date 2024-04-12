@@ -1,42 +1,32 @@
-import { verifyAccessToken } from './auth.service'
-import * as userService from '@/server/modules/user/user.service'
-import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
-import { cookies } from 'next/headers'
-import { getIronSession, type IronSession } from 'iron-session';
-import { db } from '@/server/db';
+import { verifyAccessToken } from "./auth.service";
+import * as userService from "@/server/modules/user/user.service";
+import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
+import { type IronSession } from "iron-session";
+import { getSession } from "../session/session.service";
 
-const SESSION_PASSWORD = process.env.SESSION_PASSWORD || ''
-const SESSION_NAME = 'iron_session'
-if (process.env.NODE_ENV !== 'production') {
-  console.log(`SESSION_PASSWORD: ${SESSION_PASSWORD}`)
-  console.log(`SESSION_NAME: ${SESSION_NAME}`)
-}
 export async function extractUserFromAuthHeader(req: Request) {
-  const authHeader = req.headers.get('Authorization')
-  if (!authHeader)
-    return null
-  const token = authHeader.split(' ')[1]
-  if (!token)
-    return null
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) return null;
+  const token = authHeader.split(" ")[1];
+  if (!token) return null;
 
-  let userId: string | null = null
+  let userId: string | null = null;
   try {
-    userId = await verifyAccessToken(token)
-  } catch (err) {
-  }
+    userId = await verifyAccessToken(token);
+  } catch (err) {}
 
-  if (!userId)
-    return null
+  if (!userId) return null;
 
-  const user = await userService.findOne(+userId)
-  if (!user)
-    return null
-  return user
+  const user = await userService.findOne(+userId);
+  if (!user) return null;
+  return user;
 }
 
-export async function extractUserFromSession(session: IronSession<{ userId: number | null }>) {
-  if (!session.userId) return null
-  return await userService.findOne(session.userId) ?? null
+export async function extractUserFromSession(
+  session: IronSession<{ userId: number | null }>
+) {
+  if (!session.userId) return null;
+  return (await userService.findOne(session.userId)) ?? null;
 }
 
 /**
@@ -44,14 +34,14 @@ export async function extractUserFromSession(session: IronSession<{ userId: numb
  * This function is called for every incoming request
  */
 export async function createContext(opts: FetchCreateContextFnOptions) {
-  let user = await extractUserFromAuthHeader(opts.req)
-  const session = await getSession()
+  let user = await extractUserFromAuthHeader(opts.req);
+  const session = await getSession<{ userId: number | null }>();
   if (!user) {
-    user = await extractUserFromSession(session)
+    user = await extractUserFromSession(session);
   }
-  return { user, session }
+  return { user, session };
 }
 
-export async function getSession() {
-  return await getIronSession<{ userId: number | null }>(cookies(), { password: SESSION_PASSWORD, cookieName: SESSION_NAME })
+export async function getAuthSession() {
+  return await getSession<{ userId: number | null }>();
 }

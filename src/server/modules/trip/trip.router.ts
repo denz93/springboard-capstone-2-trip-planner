@@ -52,5 +52,18 @@ export const tripRouter = router({
 
   remove: tripOwnerProcedure.mutation(async (opts) => {
     return await tripService.remove(opts.input.id);
-  })
+  }),
+
+  createTripFromPublicItinerary: authProcedure
+    .input(
+      z.object({
+        itineraryId: z.number()
+      })
+    )
+    .mutation(async (opts) => {
+      return await tripService.createTripFromPublicItinerary(
+        opts.input.itineraryId,
+        opts.ctx.user.id
+      );
+    })
 });

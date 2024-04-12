@@ -6,7 +6,8 @@ import {
   Trip,
   db,
   Place,
-  SelectUserSchema
+  SelectUserSchema,
+  ItineraryStop
 } from "@/server/db";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
@@ -128,5 +129,68 @@ export async function createTripAndItinerary(
     return { ...trip, itinerary } as typeof trip & {
       itinerary: typeof itinerary;
     };
+  });
+}
+
+/**
+ * Duplicate itineray details and its stops, and create a new trip associated with it
+ * @param itineraryId
+ * @param userId
+ * @returns [Trip]
+ */
+export async function createTripFromPublicItinerary(
+  itineraryId: number,
+  userId: number
+) {
+  return await db.transaction(async (tx) => {
+    const itinerary = await tx.query.Itinerary.findFirst({
+      where: eq(Itinerary.id, itineraryId)
+    });
+    if (!itinerary) throw new Error("Itinerary not found");
+    if (!itinerary.isPublic) throw new Error("Itinerary is not public");
+
+    const duplicateItinerary = (
+      await tx
+        .insert(Itinerary)
+        .values({
+          ...itinerary,
+          ownerId: userId,
+          isPublic: false,
+          createdAt: undefined,
+          id: undefined
+        })
+        .returning()
+    ).at(0);
+    if (!duplicateItinerary) throw new Error("Cannot duplicate itinerary");
+
+    const stops = await tx.query.ItineraryStop.findMany({
+      where: eq(ItineraryStop.itineraryId, itineraryId)
+    });
+
+    const newStops = stops.map((stop) => ({
+      ...stop,
+      id: undefined,
+      itineraryId: duplicateItinerary.id
+    }));
+
+    if (newStops.length > 0) {
+      await tx.insert(ItineraryStop).values(newStops);
+    }
+
+    const trip = (
+      await tx
+        .insert(Trip)
+        .values({
+          userId: userId,
+          name: duplicateItinerary.name,
+          description: duplicateItinerary.description,
+          itineraryId: duplicateItinerary.id
+        })
+        .returning()
+    ).at(0);
+
+    if (!trip) throw new Error("Cannot duplicate trip");
+
+    return trip;
   });
 }

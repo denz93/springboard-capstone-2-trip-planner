@@ -6,12 +6,16 @@ import {
   UpdateItinerarySchema,
   SelectItinerarySchema,
   ItineraryStop,
-  SelectItineraryStopSchema
+  SelectItineraryStopSchema,
+  Place
 } from "@/server/db";
 import { z } from "zod";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import * as itineraryStopService from "@/server/modules/itinerary-stop/itinerary-stop.service";
-import { ItinerarySearchFilterSchema } from "@/server/modules/itinerary/itinerary.schema";
+import {
+  ItinerarySearchFilterSchema,
+  PaginationParamsSchema
+} from "@/server/modules/itinerary/itinerary.schema";
 export async function findOne(id: z.infer<typeof SelectItinerarySchema>["id"]) {
   return (await db.select().from(Itinerary).where(eq(Itinerary.id, id))).at(0);
 }
@@ -32,11 +36,26 @@ export async function findOneWithRelation(
 }
 
 export async function findAll(
-  filter: z.infer<typeof ItinerarySearchFilterSchema>
+  filter: z.infer<typeof ItinerarySearchFilterSchema>,
+  pagination: z.infer<typeof PaginationParamsSchema>
 ) {
-  return await db.query.Itinerary.findMany({
-    where: eq(Itinerary.isPublic, filter.isPublic)
+  const result = await db
+    .select()
+    .from(Itinerary)
+    .leftJoin(Place, eq(Itinerary.placeId, Place.id))
+    .where(
+      (aliases) =>
+        sql`${aliases.itineraries.isPublic} = ${filter.isPublic} and ${aliases.itineraries.id} > ${pagination.cursor}`
+    )
+    .limit(pagination.limit)
+    .orderBy((aliases) => sql`${aliases.itineraries.id} asc`);
+  const aggregate = result.map((data) => {
+    return {
+      ...data.itineraries,
+      place: data.places
+    };
   });
+  return aggregate;
 }
 export async function create(itinerary: z.infer<typeof InsertItinerarySchema>) {
   return (await db.insert(Itinerary).values(itinerary).returning()).at(0);
@@ -54,12 +73,13 @@ export async function update(itinerary: z.infer<typeof UpdateItinerarySchema>) {
 
 export async function publish(
   id: z.infer<typeof SelectItinerarySchema>["id"],
-  owner_id: NonNullable<z.infer<typeof InsertItinerarySchema>["ownerId"]>
+  ownerId: NonNullable<z.infer<typeof InsertItinerarySchema>["ownerId"]>,
+  isPublic: boolean
 ) {
   const result = await db
     .update(Itinerary)
-    .set({ isPublic: true })
-    .where(and(eq(Itinerary.id, id), eq(Itinerary.ownerId, owner_id)))
+    .set({ isPublic })
+    .where(and(eq(Itinerary.id, id), eq(Itinerary.ownerId, ownerId)))
     .returning();
   return result[0];
 }

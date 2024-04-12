@@ -37,10 +37,12 @@ export const User = pgTable(
 export const Account = pgTable(
   "accounts",
   {
-    type: AccountEnum("type"),
-    userId: integer("user_id").references(() => User.id, {
-      onDelete: "cascade"
-    }),
+    type: AccountEnum("type").notNull(),
+    userId: integer("user_id")
+      .references(() => User.id, {
+        onDelete: "cascade"
+      })
+      .notNull(),
     secret: varchar("value"),
     metadata: jsonb("metadata")
   },
@@ -180,6 +182,10 @@ export const itineraryStopRelations = relations(
   })
 );
 
+export const accountRelations = relations(Account, ({ one }) => ({
+  user: one(User, { fields: [Account.userId], references: [User.id] })
+}));
+
 export const InsertUserSchema = createInsertSchema(User, {
   email: (schema) => schema.email.email(),
   name: (schema) => schema.name.trim()
@@ -231,3 +237,6 @@ export const InsertPlaceSchema = createInsertSchema(Place).extend({
   lat: z.number(),
   lng: z.number()
 });
+
+export const SelectAccountSchema = createSelectSchema(Account);
+export const InsertAccountSchema = createInsertSchema(Account);

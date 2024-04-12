@@ -6,7 +6,7 @@ export async function Header() {
   const isLogin = !!user;
 
   return (
-    <header className="border-b-[1px]">
+    <header className="sticky inset-y-0 z-10 border-b-2 border-gray-700">
       <Navbar initialUser={user} />
     </header>
   );

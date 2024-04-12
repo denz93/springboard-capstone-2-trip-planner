@@ -10,6 +10,7 @@ import {
 } from "react";
 import { useGoogleMapApiKey } from "./context";
 import { Loader } from "@googlemaps/js-api-loader";
+import { useQuery } from "@tanstack/react-query";
 
 enum GeoErrorType {
   "PERMISSION_DENIED" = 1,
@@ -155,4 +156,21 @@ export function useGooglePlaceService() {
   }, [PlacesLibrary, placesService]);
 
   return placesService;
+}
+
+export function usePlaceDetailsQuery(placeId: string) {
+  const placesService = useGooglePlaceService();
+  const query = useQuery({
+    queryKey: ["google.placePhoto", placeId],
+    enabled: !!placesService,
+    queryFn: async () => {
+      if (!placesService) return null;
+      return new Promise<google.maps.places.PlaceResult | null>((resolve) => {
+        placesService.getDetails({ placeId: placeId }, (data) => {
+          resolve(data);
+        });
+      });
+    }
+  });
+  return query;
 }

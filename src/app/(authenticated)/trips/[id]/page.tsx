@@ -1,12 +1,12 @@
-import { randomBackgroundUrl } from "@/app/trips/[id]/random-bg";
-import TripDetail from "@/app/trips/[id]/itinerary-detail";
+import { randomBackgroundUrl } from "@/app/(authenticated)/trips/[id]/random-bg";
+import ItineraryDetail from "@/app/(authenticated)/trips/[id]/itinerary-detail";
 import * as tripService from "@/server/modules/trip/trip.service";
 import Image from "next/image";
 import { CiEdit } from "react-icons/ci";
 import Modal from "@/app/components/modal";
 import EditTripForm from "./trip-edit-form";
 import TripStat from "./trip-stat";
-import { FaTrash } from "react-icons/fa6";
+import { FaShare, FaTrash } from "react-icons/fa6";
 import RemoveTrip from "./remove-trip";
 
 export default async function TripPage({ params }: { params: { id: number } }) {
@@ -72,7 +72,7 @@ export default async function TripPage({ params }: { params: { id: number } }) {
         </div>
       </h1>
 
-      <TripDetail initialTrip={trip} tripId={trip.id} />
+      <ItineraryDetail initialTrip={trip} tripId={trip.id} />
     </div>
   );
 }

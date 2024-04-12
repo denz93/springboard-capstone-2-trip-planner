@@ -1,4 +1,4 @@
-import { getUser } from "../helpers/server/auth";
+import { getUser } from "@/app/helpers/server/auth";
 import ProfileUpdateForm from "./profile-update-form";
 
 export default async function Profile() {

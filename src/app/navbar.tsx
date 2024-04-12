@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaPlus } from "react-icons/fa6";
 import { usePathname } from "next/navigation";
+import RainbowText from "./components/ranbow-text";
 export default function Navbar({
   initialUser
 }: {
@@ -26,15 +27,17 @@ export default function Navbar({
   });
   const pathName = usePathname();
   const isActive = (path: string) => pathName === path;
-
+  const displayName = user?.name
+    ? user.name.substring(0, 2)
+    : user?.email.substring(0, 2);
   return (
-    <nav className="navbar bg-base-100 sticky z-20 w-full">
+    <nav className="navbar bg-base-100/60 backdrop-blur-lg z-20 w-full">
       <div className="flex-1">
         <Link
           href={"/"}
           className="btn btn-ghost text-3xl font-bold tracking-tight text-slate-200"
         >
-          Trip Planner
+          <RainbowText>Trip Planner</RainbowText>
         </Link>
       </div>
       <div className="ml-auto flex gap-4 items-center">
@@ -49,14 +52,7 @@ export default function Navbar({
               <FaPlus />
               New Trip
             </Link>
-            <Link
-              className={
-                "btn btn-ghost " + (isActive("/trips") ? "btn-active" : "")
-              }
-              href={"/trips"}
-            >
-              Trips
-            </Link>
+
             <div className="dropdown dropdown-end">
               <div
                 tabIndex={0}
@@ -64,10 +60,21 @@ export default function Navbar({
                 className="btn btn-circle btn-outline"
               >
                 <div className="w-10 rounded-full">
-                  {user.name?.slice(0, 2).toUpperCase()}
+                  {displayName?.toUpperCase()}
                 </div>
               </div>
               <ul className="menu menu-sm dropdown-content mt-3 z-10 p-2 shadow bg-base-100 rounded-box w-52 border border-slate-600">
+                <li>
+                  <Link
+                    className={
+                      "btn btn-ghost " +
+                      (isActive("/trips") ? "btn-active" : "")
+                    }
+                    href={"/trips"}
+                  >
+                    My Trips
+                  </Link>
+                </li>
                 <li>
                   <Link
                     className={
@@ -97,10 +104,10 @@ export default function Navbar({
 
         {!isLogin && (
           <>
-            <Link className="" href={"/login"}>
+            <Link className="btn btn-ghost" href={"/login"}>
               Login
             </Link>
-            <Link className="" href={"/register"}>
+            <Link className="btn btn-ghost" href={"/register"}>
               Register
             </Link>
           </>

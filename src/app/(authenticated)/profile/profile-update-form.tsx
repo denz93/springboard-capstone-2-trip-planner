@@ -1,14 +1,19 @@
 "use client";
 
 import { useForm, SubmitHandler } from "react-hook-form";
-import { RouterInputs, RouterOutputs, trpc } from "../api/trpc/[trpc]/client";
+import {
+  RouterInputs,
+  RouterOutputs,
+  trpc
+} from "@/app/api/trpc/[trpc]/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateUserSchema } from "@/server/modules/user/user.schema";
-import { useAlert } from "../components/alert";
+import { useAlert } from "@/app/components/alert";
 
 type User = NonNullable<RouterOutputs["auth"]["me"]["me"]>;
 type UpdateFormData = RouterInputs["user"]["update"];
 export default function ProfileUpdateForm({ user }: { user: User }) {
+  const utils = trpc.useUtils();
   const {
     register,
     handleSubmit,
@@ -20,8 +25,9 @@ export default function ProfileUpdateForm({ user }: { user: User }) {
     }
   });
   const { mutate: updateUser, isPending } = trpc.user.update.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       alertPush({ message: "Profile has been updated!", type: "success" });
+      utils.auth.me.setData(undefined, () => ({ me: data ?? null }));
     },
     onError: (error) => {
       alertPush({ message: error.message, type: "error" });
@@ -34,7 +40,7 @@ export default function ProfileUpdateForm({ user }: { user: User }) {
 
   return (
     <form
-      className="mx-auto grid grid-col-1 md:w-8/12 justify-center gap-2"
+      className="mx-auto grid grid-col-1 md:w-8/12 justify-center gap-4"
       onSubmit={handleSubmit(submitHandler)}
     >
       <div className="join">

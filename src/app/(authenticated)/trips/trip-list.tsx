@@ -2,15 +2,15 @@
 
 import { trpc } from "@/app/api/trpc/[trpc]/client";
 import type { RouterOutputs, RouterInputs } from "@/app/api/trpc/[trpc]/client";
-import TripCard from "@/app/trips/trip-card";
+import TripCard from "./trip-card";
 import Link from "next/link";
-import { sortBy } from "../helpers/sort";
+import { sortBy } from "@/app/helpers/sort";
 import { differenceInDays } from "date-fns";
 type TripListType = RouterOutputs["trip"]["getUserTrips"];
 
 export default function TripList({
   initialTrips,
-  userId,
+  userId
 }: {
   initialTrips: TripListType;
   userId: RouterInputs["trip"]["getUserTrips"]["userId"];
@@ -20,8 +20,13 @@ export default function TripList({
     {
       initialData: initialTrips,
       select(trips) {
-        return sortBy(trips).desc().by(t => t.startDate && t.startDate > new Date() ? 1 : -1).asc().by(t => differenceInDays(t.startDate ?? new Date(), new Date())).result()
-      },
+        return sortBy(trips)
+          .desc()
+          .by((t) => (t.startDate && t.startDate > new Date() ? 1 : -1))
+          .asc()
+          .by((t) => differenceInDays(t.startDate ?? new Date(), new Date()))
+          .result();
+      }
     }
   );
 
@@ -34,7 +39,10 @@ export default function TripList({
       {data.length === 0 && <li className="text-center">No trips</li>}
       {data.map((trip) => (
         <li key={trip.id}>
-          <Link href={`/trips/${trip.id}`} className="no-underline block h-full">
+          <Link
+            href={`/trips/${trip.id}`}
+            className="no-underline block h-full"
+          >
             <TripCard trip={trip} />
           </Link>
         </li>

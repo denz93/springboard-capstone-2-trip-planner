@@ -200,7 +200,7 @@ export default function NewTripForm() {
         )}
 
         <button className="btn btn-neutral" disabled={isCreatePlacePending}>
-          Submit{" "}
+          Create{" "}
           {isCreateTripPending ? (
             <span className="loading loading-bars loading-xs"></span>
           ) : (

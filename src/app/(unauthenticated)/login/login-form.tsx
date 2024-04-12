@@ -9,21 +9,21 @@ export default function LoginForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm<z.infer<typeof LocalLoginInputSchema>>({
-    resolver: zodResolver(LocalLoginInputSchema),
+    resolver: zodResolver(LocalLoginInputSchema)
   });
   const utils = trpc.useUtils();
   const router = useRouter();
   const {
     mutate,
     isPending,
-    error: mutationError,
+    error: mutationError
   } = trpc.auth.loginLocal.useMutation({
     onSuccess: (data) => {
       utils.auth.me.setData(undefined, () => ({ me: data ?? null }));
       router.replace("/");
-    },
+    }
   });
   return (
     <form
@@ -36,6 +36,7 @@ export default function LoginForm() {
         <label htmlFor="email">Email</label>
         {errors.email && <label htmlFor="email">{errors.email.message}</label>}
         <input
+          className="input input-bordered w-full"
           disabled={isPending}
           id="email"
           type="email"
@@ -49,6 +50,7 @@ export default function LoginForm() {
           <label htmlFor="password">{errors.password.message}</label>
         )}
         <input
+          className="input input-bordered w-full"
           disabled={isPending}
           id="password"
           type="password"
@@ -56,7 +58,7 @@ export default function LoginForm() {
           {...register("password")}
         />
       </div>
-      <button className="w-full" disabled={isPending}>
+      <button className="w-full btn btn-ghost" disabled={isPending}>
         Login
       </button>
       {mutationError && <label>{mutationError.message}</label>}

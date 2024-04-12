@@ -30,7 +30,7 @@ export default function RemoveTrip({
     <div className="grid grid-cols-1 items-center justify-center">
       <p className="text-center">Are you sure you want to remove this trip?</p>
       <div className="divider"></div>
-      <div className="flex justify-end gap-4">
+      <form method={"dialog"} className="flex justify-end gap-4">
         <button
           className="btn btn-neutral"
           disabled={isPending}
@@ -39,7 +39,7 @@ export default function RemoveTrip({
           Yes
         </button>
         <button className="btn btn-neutral btn-outline">No</button>
-      </div>
+      </form>
     </div>
   );
 }

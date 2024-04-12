@@ -86,7 +86,7 @@ export default function ItineraryText({
               className="flex flex-col gap-2 w-full scroll-smooth"
               id={`day_${ordinalDay}`}
             >
-              <div className="divider divider-neutral w-full font-extrabold font-mono text-xl">
+              <div className="divider w-full font-extrabold font-mono text-xl">
                 {(!highlightStop ||
                   highlightStop.ordinalDay !== +ordinalDay) && (
                   <div className="block min-w-20 text-center">

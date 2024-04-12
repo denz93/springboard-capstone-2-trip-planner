@@ -25,7 +25,7 @@ export default async function RootLayout({
           <GoogleMapProvider apiKey={process.env.GOOGLE_MAP_API_KEY ?? ""}>
             <AlertProvider>
               <Header />
-              <main className="px-8 py-8">{children}</main>
+              <main>{children}</main>
               <Footer />
             </AlertProvider>
           </GoogleMapProvider>
