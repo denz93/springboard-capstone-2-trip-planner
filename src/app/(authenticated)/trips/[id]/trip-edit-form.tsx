@@ -32,8 +32,10 @@ export default function EditTripForm({ trip }: { trip: FormInputs }) {
     isSuccess
   } = trpc.trip.update.useMutation({
     onSuccess(data) {
-      utils.trip.getTrip.setData({ id: data.id }, () => data);
-      utils.trip.getTripWithItinerary.invalidate({ id: data.id });
+      if (data) {
+        utils.trip.getTrip.setData({ id: data.id }, () => data);
+        utils.trip.getTripWithItinerary.invalidate({ id: data.id });
+      }
       reset(data);
       setTimer(7000);
     }

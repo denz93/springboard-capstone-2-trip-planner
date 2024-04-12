@@ -36,7 +36,6 @@ const alertVarriants = {
 export function AlertProvider({ children }: { children: React.ReactNode }) {
   const state = useState<Alert[]>([]);
   const [alerts] = state;
-  console.log(`Rendering ${alerts.length} alerts`);
   return (
     <AlertContext.Provider value={state}>
       <div className="fixed top-0 right-0 z-50 grid grid-cols-1 gap-y-2">

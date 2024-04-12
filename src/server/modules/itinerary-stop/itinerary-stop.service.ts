@@ -10,12 +10,10 @@ export async function create(stop: z.infer<typeof InsertItineraryStopSchema>) {
 export async function findByItineraryId(
   itineraryId: NonNullable<
     z.infer<typeof InsertItineraryStopSchema>["itineraryId"]
-  >,
+  >
 ) {
   return await db
     .select()
     .from(ItineraryStop)
     .where(eq(ItineraryStop.itineraryId, itineraryId));
 }
-
-export async function createWithThirdPartyPlaceId(stop) {}

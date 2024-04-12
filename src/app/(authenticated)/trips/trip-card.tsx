@@ -35,7 +35,11 @@ export default function TripCard({ trip }: { trip: TripType }) {
     <div className="card bg-base-300 shadow-xl h-full">
       <figure className="relative h-72">
         {photoUrl && (
-          <img src={photoUrl} className="h-full w-full object-cover" />
+          <img
+            src={photoUrl}
+            className="h-full w-full object-cover"
+            alt={trip.name}
+          />
         )}
         {!photoUrl && <div className="skeleton h-72 w-72"></div>}
         <div className="absolute w-full h-full bg-slate-950/60"></div>

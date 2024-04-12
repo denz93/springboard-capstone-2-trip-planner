@@ -172,7 +172,10 @@ export default function AddItineraryStop({
               {selectedPlace.types && (
                 <div className="flex flex-wrap gap-[.125em]">
                   {selectedPlace.types.map((t) => (
-                    <div className="badge badge-neutral uppercase text-[10px] font-bold">
+                    <div
+                      key={t}
+                      className="badge badge-neutral uppercase text-[10px] font-bold"
+                    >
                       {t.replaceAll("_", " ")}
                     </div>
                   ))}
