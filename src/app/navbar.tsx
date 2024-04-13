@@ -3,9 +3,11 @@ import { trpc } from "@/app/api/trpc/[trpc]/client";
 import { getUser } from "@/app/helpers/server/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FaPlus } from "react-icons/fa6";
+import { FaBurger, FaPlus } from "react-icons/fa6";
 import { usePathname } from "next/navigation";
 import RainbowText from "./components/ranbow-text";
+import { CiMenuBurger } from "react-icons/ci";
+import { IoClose, IoMenu } from "react-icons/io5";
 export default function Navbar({
   initialUser
 }: {
@@ -32,7 +34,7 @@ export default function Navbar({
     : user?.email.substring(0, 2);
   return (
     <nav className="navbar bg-base-100/60 backdrop-blur-lg z-20 w-full @container/nav">
-      <div className="flex-1">
+      <div className="">
         <Link
           href={"/"}
           className="btn btn-ghost text-3xl font-bold tracking-tight text-slate-200"
@@ -104,14 +106,39 @@ export default function Navbar({
         )}
 
         {!isLogin && (
-          <>
-            <Link className="btn btn-ghost" href={"/login"}>
-              Login
-            </Link>
-            <Link className="btn btn-ghost" href={"/register"}>
-              Register
-            </Link>
-          </>
+          <div className="dropdown dropdown-end xl:flex xl:static">
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn btn-circle btn-outline group xl:hidden"
+            >
+              <IoMenu className="group-focus:opacity-0 group-focus:absolute opacity-100 transition-opacity" />
+              <IoClose className="group-focus:opacity-100 group-focus:static opacity-0 absolute transition-opacity" />
+            </div>
+            <ul className="menu menu-sm dropdown-content mt-3 z-10 p-2 shadow bg-base-100 rounded-box w-52 border border-slate-600 xl:!flex-row xl:!static xl:!visible xl:!opacity-100 xl:!p-0 xl:!m-0 xl:bg-transparent xl:!border-none xl:shadow-none xl:!transform-none xl:w-auto">
+              <li className="xl:block">
+                <Link
+                  className={
+                    "btn btn-ghost " + (isActive("/login") ? "btn-active" : "")
+                  }
+                  href={"/login"}
+                >
+                  Login
+                </Link>
+              </li>
+              <li className="xl:block">
+                <Link
+                  className={
+                    "btn btn-ghost " +
+                    (isActive("/register") ? "btn-active" : "")
+                  }
+                  href={"/register"}
+                >
+                  Register
+                </Link>
+              </li>
+            </ul>
+          </div>
         )}
       </div>
 
