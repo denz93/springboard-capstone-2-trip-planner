@@ -31,7 +31,7 @@ export default function Navbar({
     ? user.name.substring(0, 2)
     : user?.email.substring(0, 2);
   return (
-    <nav className="navbar bg-base-100/60 backdrop-blur-lg z-20 w-full">
+    <nav className="navbar bg-base-100/60 backdrop-blur-lg z-20 w-full @container/nav">
       <div className="flex-1">
         <Link
           href={"/"}
@@ -45,7 +45,8 @@ export default function Navbar({
           <>
             <Link
               className={
-                "btn btn-ghost " + (isActive("/trips/new") ? "btn-active" : "")
+                "@md/nav:flex hidden btn btn-ghost " +
+                (isActive("/trips/new") ? "btn-active" : "")
               }
               href={"/trips/new"}
             >
@@ -113,6 +114,21 @@ export default function Navbar({
           </>
         )}
       </div>
+
+      {isLogin && (
+        <div className="@md/nav:hidden @md/nav:backdrop-blur-3xl fixed -bottom-[calc(100svh-120%)] right-[4%] backdrop-blur-xl bg-base-200/60 btn btn-circle  w-16 h-16  shadow-xl isolate">
+          <Link
+            className={
+              "btn btn-circle btn-outline font-bold w-16 h-16 flex-col text-[11px]  gap-1  " +
+              (isActive("/trips/new") ? "btn-active" : "")
+            }
+            href={"/trips/new"}
+          >
+            <FaPlus className="inline-block" />
+            New Trip
+          </Link>
+        </div>
+      )}
     </nav>
   );
 }

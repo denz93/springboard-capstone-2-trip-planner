@@ -28,7 +28,7 @@ export default function TripStat({ initialTrip }: { initialTrip: Trip }) {
   }
 
   return (
-    <div className="stats stats-vertical lg:stats-horizontal ">
+    <div className="stats stats-vertical 4xl:stats-horizontal ">
       {trip.hasChildren && (
         <div className="stat place-items-center lg:px-10 gap-y-2">
           <div className="stat-title text-2xl ">

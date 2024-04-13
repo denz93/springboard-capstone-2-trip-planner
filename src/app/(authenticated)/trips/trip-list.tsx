@@ -35,7 +35,7 @@ export default function TripList({
   }
 
   return (
-    <ul className="list-none grid grid-cols-1 auto-rows-fr gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className="list-none grid grid-cols-1 auto-rows-fr gap-x-6 gap-y-8 2xl:grid-cols-2 5xl:grid-cols-3">
       {data.length === 0 && <li className="text-center">No trips</li>}
       {data.map((trip) => (
         <li key={trip.id}>

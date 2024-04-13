@@ -27,7 +27,7 @@ export default function ItineraryCard({ itinerary }: { itinerary: Itinerary }) {
     });
 
   return (
-    <div className="card bg-base-100">
+    <div className="card bg-base-200">
       <figure className="w-full h-56">
         {isPending && <div className="skeleton w-full h-full"></div>}
         {isSuccess && placeDetails && (

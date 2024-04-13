@@ -63,7 +63,7 @@ export default function ItineraryDetail({
           </Modal>
         </div>
       </div>
-      <div className="row-start-3 col-start-1 col-span-2 lg:col-start-1 lg:col-span-1 lg:row-start-2">
+      <div className="row-start-3 col-start-1 col-span-2 3xl:col-start-1 3xl:col-span-1 3xl:row-start-2">
         <ItineraryText
           itinerary={trip.itinerary}
           highlightStop={highlightStop}
@@ -71,7 +71,7 @@ export default function ItineraryDetail({
         />
       </div>
 
-      <div className="row-start-2 col-start-1 col-span-2 md:  lg:col-start-2 lg:col:span-1 ">
+      <div className="row-start-2 col-start-1 col-span-2 3xl:col-start-2 3xl:col:span-1 ">
         <ItineraryMap
           itinerary={trip.itinerary}
           onSelectedStop={(s) => setHighlightStop(s)}

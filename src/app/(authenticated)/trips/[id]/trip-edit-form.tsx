@@ -7,17 +7,14 @@ import { UpdateTripSchema } from "@/server/db/schema";
 import { DatePickerWithRange } from "@/components/ui/date-picker-with-range";
 import useTimer from "@/app/components/use-timer";
 type FormInputs = RouterInputs["trip"]["update"];
-type Trip = RouterInputs["trip"];
 
 export default function EditTripForm({ trip }: { trip: FormInputs }) {
   const {
     register,
     handleSubmit,
-    formState: { errors, isDirty, touchedFields },
+    formState: { errors, isDirty },
     setValue,
-    trigger,
-    reset,
-    resetField
+    reset
   } = useForm<FormInputs>({
     resolver: zodResolver(UpdateTripSchema),
     defaultValues: trip
@@ -45,7 +42,7 @@ export default function EditTripForm({ trip }: { trip: FormInputs }) {
   };
   return (
     <form
-      className="grid grid-cols-2 gap-y-6 gap-x-4 px-8 "
+      className="grid grid-cols-1 3xl:grid-cols-2 gap-y-6 gap-x-4 px-8 "
       onSubmit={handleSubmit(submitHandler, (errors) =>
         console.log({ errors })
       )}
@@ -89,7 +86,7 @@ export default function EditTripForm({ trip }: { trip: FormInputs }) {
           />
         </div>
       </div>
-      <div className="col-start-1 col-span-2">
+      <div className="col-start-1 3xl:col-span-2">
         <div className="label">
           <label className="label-text " htmlFor="description">
             Description
@@ -108,13 +105,13 @@ export default function EditTripForm({ trip }: { trip: FormInputs }) {
         </div>
       </div>
 
-      <div className="join join-horizontal col-start-1 col-span-2">
+      <div className="join join-horizontal col-start-1 3xl:col-span-2">
         <label className="btn btn-neutral join-item" htmlFor="start_date">
-          Start Date - End Date
+          Start-End
         </label>
         <div
           className={
-            "join-item " +
+            "join-item w-full " +
             `${errors.startDate || errors.endDate ? "tooltip tooltip-error  tooltip-open tooltip-top" : ""}`
           }
           data-tip={errors.startDate?.message || errors.endDate?.message}
@@ -150,7 +147,7 @@ export default function EditTripForm({ trip }: { trip: FormInputs }) {
         </label>
       </div>
 
-      <div className="col-start-1 col-span-2">
+      <div className="col-start-1 3xl:col-span-2">
         <div className="divider"></div>
         <div className="flex gap-4 justify-end">
           {isTiming && isMutationError && (

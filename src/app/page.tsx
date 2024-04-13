@@ -10,7 +10,7 @@ export default async function Home() {
     { limit: 5, cursor: 0 }
   );
   return (
-    <div className="min-h-screen mb-8">
+    <div className="min-h-screen mb-8 @container">
       <div className="hero min-h-[calc(100svh_-_65px)] relative">
         <Image
           className="object-cover w-full h-full absolute"
@@ -18,7 +18,7 @@ export default async function Home() {
           alt="trip planner hero"
         />
         <div className="hero-overlay bg-opacity-30 z-0"></div>
-        <div className="hero-content text-center text-neutral-content rounded-box bg-base-300/50 backdrop-blur-lg">
+        <div className="hero-content text-center text-neutral-content rounded-box bg-base-300/50 backdrop-blur-lg mx-1">
           <div className="max-w-xl">
             <h1 className="mb-5 text-5xl font-bold">Trip Planner</h1>
             <p className="mb-5 font-light italic">
@@ -32,8 +32,8 @@ export default async function Home() {
         </div>
       </div>
 
-      <h1 className="divider mt-20 mb-12 px-6">Popular Trips</h1>
-      <div className="mx-auto px-6">
+      <h1 className="divider mt-20 mb-12 px-2 @md:px-6">Popular Trips</h1>
+      <div className="mx-auto px-2 @md:px-6">
         <ItineraryCardCarousel initialItineraries={itineraries} />
       </div>
     </div>

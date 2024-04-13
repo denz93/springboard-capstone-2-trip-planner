@@ -99,17 +99,17 @@ export default function AddItineraryStop({
 
   return (
     <form
-      className="grid grid-cols-2 gap-6"
+      className="grid grid-cols-1 2xl:grid-cols-2 gap-6 @container"
       onSubmit={handleSubmit(submitHandler)}
     >
       <div
         className={
-          "col-span-2 mx-auto w-full flex justify-center" +
+          "@lg:col-span-2 mx-auto w-full flex justify-center" +
           `${errors.placeId ? "tooltip tooltip-error  tooltip-open tooltip-top" : ""}`
         }
         data-tip={errors.placeId?.message}
       >
-        <div className="join join-horizontal w-full md:w-3/4">
+        <div className="join join-horizontal w-full 2xl:w-3/4">
           <div className="btn btn-neutral join-item">Find Place</div>
           <div className="join-item w-full *:w-full">
             <PlaceSearch
@@ -135,8 +135,8 @@ export default function AddItineraryStop({
       </div>
 
       {selectedPlace && (
-        <div className="col-span-2 ">
-          <div className="min-w-80 w-8/12 grid grid-cols-5 mx-auto">
+        <div className="@lg:col-span-2 ">
+          <div className="w-full 4xl:w-8/12 grid grid-cols-5 mx-auto">
             <div className="col-span-2 max-h-32  h-full w-full">
               <img
                 className="object-cover w-full h-full"
@@ -150,8 +150,8 @@ export default function AddItineraryStop({
                 {selectedPlace.vicinity}
               </p>
               {selectedPlace.rating && (
-                <div className="flex w-full py-1 items-center font-mono">
-                  <p className="text-sm font-light flex gap-1 items-center badge badge-primary">
+                <div className="flex flex-wrap w-full py-1 items-center font-mono gap-y-1 gap-x-2">
+                  <p className="flex-shrink-0 text-sm font-light flex gap-1 items-center badge badge-primary">
                     {selectedPlace.rating}
                     <FaStar />
                     {selectedPlace.user_ratings_total && (
@@ -163,7 +163,7 @@ export default function AddItineraryStop({
                   </p>
 
                   {selectedPlace.price_level && (
-                    <div className="mx-auto">
+                    <div className="2xl:ml-auto">
                       {priceLevelBadge(selectedPlace.price_level)}
                     </div>
                   )}
@@ -281,7 +281,7 @@ export default function AddItineraryStop({
         </div>
       </div>
 
-      <div className="col-span-2 flex flex-end justify-end items-center">
+      <div className="@lg:col-span-2 flex flex-end justify-end items-center">
         <div className="mr-auto flex-gap-1">
           {createPlaceError && (
             <p className="alert alert-error">{createPlaceError.message}</p>

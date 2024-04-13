@@ -51,7 +51,7 @@ export default function NewTripForm() {
     useState<google.maps.places.PlaceResult | null>(null);
   return (
     <form
-      className="grid grid-cols-2 gap-4"
+      className="grid grid-cols-1 2xl:grid-cols-2  gap-4 "
       onSubmit={handleSubmit(submitHanlder)}
     >
       <div
@@ -120,7 +120,7 @@ export default function NewTripForm() {
         ></textarea>
       </label>
 
-      <div className="grid grid-col-1 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <label className={"form-control "}>
           <div className="label">
             <span className="label-text">
@@ -186,8 +186,8 @@ export default function NewTripForm() {
         </div>
       </div>
 
-      <div className="divider divide-x col-start-1 col-span-2"></div>
-      <div className="col-start-1 col-span-2 flex justify-end items-center">
+      <div className="divider divide-x col-start-1 2xl:col-span-2"></div>
+      <div className="col-start-1 2xl:col-span-2 flex justify-end items-center">
         {isCreateTripSuccess && (
           <div className="alert alert-success shadow-lg">
             Your trip has been created!
